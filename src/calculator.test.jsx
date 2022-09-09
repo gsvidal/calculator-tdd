@@ -1,8 +1,16 @@
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import { afterEach, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 
-import { numbers, operators, equalSign, Calculator } from './Calculator';
+import {
+  numbers,
+  operators,
+  clearSign,
+  clearEntrySign,
+  equalSign,
+  Calculator,
+} from './Calculator';
+import { equal } from 'mathjs';
 
 describe('Calculator', () => {
   afterEach(cleanup);
@@ -40,10 +48,16 @@ describe('Calculator', () => {
     });
   });
 
-  it('should render equal sign', () => {
+  it('should render equal sign button', () => {
     render(<Calculator />);
 
     screen.getByText(equalSign);
+  });
+
+  it('should render clear sign button', () => {
+    render(<Calculator />);
+
+    screen.getByText(clearSign);
   });
 
   it('should render input box', () => {
@@ -52,7 +66,7 @@ describe('Calculator', () => {
     screen.getByRole('textbox');
   });
 
-  it('should input after clicking a number', async () => {
+  it('should show input value after clicking a number button', async () => {
     render(<Calculator />);
 
     const one = screen.getByText('1');
@@ -63,7 +77,7 @@ describe('Calculator', () => {
     expect(input.value).toBe('1');
   });
 
-  it('should input after clicking many numbers', async () => {
+  it('should show input value after clicking many numbers buttons', async () => {
     render(<Calculator />);
 
     const one = screen.getByText('1');
@@ -140,8 +154,8 @@ describe('Calculator', () => {
     const randomNumberElement1 = screen.getByText(randomNumber1);
     await userEvent.click(randomNumberElement1);
 
-    const by = screen.getByText('*');
-    await userEvent.click(by);
+    const times = screen.getByText('*');
+    await userEvent.click(times);
 
     const randomNumberElement2 = screen.getByText(randomNumber2);
     await userEvent.click(randomNumberElement2);
@@ -152,5 +166,136 @@ describe('Calculator', () => {
     const input = screen.getByRole('textbox');
 
     expect(input.value).toBe((randomNumber1 * randomNumber2).toString());
+  });
+
+  it('should render a clear button (C)', async () => {
+    render(<Calculator />);
+
+    const one = screen.getByText('1');
+    await userEvent.click(one);
+
+    const plus = screen.getByText('+');
+    await userEvent.click(plus);
+
+    await userEvent.click(one);
+
+    const clearButton = screen.getByText(clearSign);
+    await userEvent.click(clearButton);
+
+    const input = screen.getByRole('textbox');
+    expect(input.value).toBe('');
+  });
+
+  it('should render a clear entry button', async () => {
+    render(<Calculator />);
+
+    const one = screen.getByText('1');
+    await userEvent.click(one);
+
+    const plus = screen.getByText('+');
+    await userEvent.click(plus);
+
+    const two = screen.getByText('2');
+    await userEvent.click(two);
+
+    const times = screen.getByText('*');
+    await userEvent.click(times);
+
+    const three = screen.getByText('3');
+    await userEvent.click(three);
+
+    const by = screen.getByText('/');
+    await userEvent.click(by);
+
+    const four = screen.getByText('4');
+    await userEvent.click(four);
+
+    const clearEntryButton = screen.getByText(clearEntrySign);
+    await userEvent.click(clearEntryButton);
+
+    const input = screen.getByRole('textbox');
+    expect(input.value).toBe('1+2*3/');
+  });
+
+  it('should render a delete button', async () => {
+    render(<Calculator />);
+
+    const one = screen.getByText('1');
+    await userEvent.click(one);
+    await userEvent.click(one);
+    await userEvent.click(one);
+
+    const deleteButton = screen.getByAltText('delete button');
+    await userEvent.click(deleteButton);
+
+    const input = screen.getByRole('textbox');
+    expect(input.value).toBe('11');
+  });
+
+  it('should show a new input value when clicking more buttons after getting a result after equal sign button', async () => {
+    render(<Calculator />);
+
+    const one = screen.getByText('1');
+    await userEvent.click(one);
+
+    const plus = screen.getByText('+');
+    await userEvent.click(plus);
+
+    await userEvent.click(one);
+
+    const equal = screen.getByText(equalSign);
+    await userEvent.click(equal);
+
+    await userEvent.click(plus);
+    await userEvent.click(one);
+
+    await userEvent.click(equal);
+
+    const input = screen.getByRole('textbox');
+    expect(input.value).toBe('3');
+  });
+
+  it('should overwrite the input value when click a number button after make a calculation previously (click equal button)', async () => {
+    render(<Calculator />);
+
+    const one = screen.getByText('1');
+    await userEvent.click(one);
+
+    const plus = screen.getByText('+');
+    await userEvent.click(plus);
+
+    await userEvent.click(one);
+
+    const equal = screen.getByText(equalSign);
+    await userEvent.click(equal);
+
+    const four = screen.getByText('4');
+    await userEvent.click(four);
+
+    const input = screen.getByRole('textbox');
+    expect(input.value).toBe('4');
+  });
+
+  it('should overwrite once the input value when click a number button after make a calculation previously (click equal button)', async () => {
+    render(<Calculator />);
+
+    const one = screen.getByText('1');
+    await userEvent.click(one);
+
+    const plus = screen.getByText('+');
+    await userEvent.click(plus);
+
+    await userEvent.click(one);
+
+    const equal = screen.getByText(equalSign);
+    await userEvent.click(equal);
+
+    const four = screen.getByText('4');
+    await userEvent.click(four);
+
+    await userEvent.click(four);
+
+    const input = screen.getByRole('textbox');
+    expect(input.value).toBe('44');
   });
 });

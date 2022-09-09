@@ -6,5 +6,8 @@ export default defineConfig({
   test: {
     // vitest config
     environment: 'happy-dom',
+    coverage: {
+      provider: 'c8',
+    },
   },
 });
