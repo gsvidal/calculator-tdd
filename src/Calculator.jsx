@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { evaluate } from 'mathjs';
 import deleteButton from './assets/icons/delete.svg';
+import './Calculator.css';
 
 export const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -36,37 +37,67 @@ export const Calculator = () => {
   };
 
   return (
-    <>
+    <div className="calculator">
       <h1>Calculator</h1>
-      <input type="text" value={value} readOnly />
-      <div role="grid">
-        {rows.map((row, index) => (
-          <div key={index} role="row">
-            {row.map((number) => (
+      <section className="calculator__body">
+        <input className="input" type="text" value={value} readOnly />
+        <div className="buttons-wrapper">
+          <div className="button-container button-container--operator">
+            {operators.map((operator) => (
               <button
-                onClick={() => handleClickButtons(number, 'num')}
-                key={number}
+                className="button button--operator"
+                onClick={() => handleClickButtons(operator, 'op')}
+                key={operator}
               >
-                {number}
+                <p>{operator}</p>
               </button>
             ))}
           </div>
-        ))}
-        {operators.map((operator) => (
-          <button
-            onClick={() => handleClickButtons(operator, 'op')}
-            key={operator}
-          >
-            {operator}
-          </button>
-        ))}
-        <button onClick={() => setValue('')}>{clearSign}</button>
-        <button onClick={handleClearEntrySign}>{clearEntrySign}</button>
-        <button onClick={() => setValue(value.slice(0, -1))}>
-          <img src={deleteButton} alt="delete button" width="15" />
-        </button>
-        <button onClick={handleEvaluation}>{equalSign}</button>
-      </div>
-    </>
+
+          <div className="button-container button-container--number">
+            {rows.map((row, index) => (
+              <div key={index} role="row">
+                {row.map((number) => (
+                  <button
+                    className="button button--number"
+                    onClick={() => handleClickButtons(number, 'num')}
+                    key={number}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="button-container button-container--extras">
+            <button
+              className="button button--extras"
+              onClick={() => setValue('')}
+            >
+              {clearSign}
+            </button>
+            <button
+              className="button button--extras"
+              onClick={handleClearEntrySign}
+            >
+              {clearEntrySign}
+            </button>
+            <button
+              className="button button--extras"
+              onClick={() => setValue(value.slice(0, -1))}
+            >
+              <img src={deleteButton} alt="delete button" width="20" />
+            </button>
+            <button
+              className="button button--extras"
+              onClick={handleEvaluation}
+            >
+              {equalSign}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
